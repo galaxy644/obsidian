@@ -1,2 +1,0 @@
-# obsidian
-New file
