@@ -39,3 +39,31 @@ href="https://www.yandex.ru"-----https://www.yandex.ru
 Но нам-то нужны все совпадения !
 
 пишем:
+```c++
+include <iostream>
+#include <fstream>
+#include<sstream>
+#include <regex>
+using namespace std;
+static string readFile(const string& fileName) {
+	ifstream f(fileName);
+	stringstream ss;
+	ss << f.rdbuf();
+	return ss.str();
+}
+int main() {
+	string src = readFile("source.txt");
+	regex reg ("href\\s?=\\s?\"(https?:\\/\\/[a-z\\.\\/]+)?\"");
+	smatch result;
+	while (regex_search(src, result, reg)) {
+		cout << result[1] << endl;
+		//внутри while бесконечно будет вестись поиск одного и того же фрагмента.
+		// поэтому после поиска возьмем оставшийся после поиска кусок
+		src = result.suffix();
+	}
+	return 0;
+}
+```
+после этого мы получим все совпадения.
+Но мы портим исходную строку и постоянно копируем содержимое строки.
+поэтому попробуем на итераторах.
