@@ -67,3 +67,32 @@ int main() {
 после этого мы получим все совпадения.
 Но мы портим исходную строку и постоянно копируем содержимое строки.
 поэтому попробуем на итераторах.
+
+```c++
+#include <iostream>
+#include <fstream>
+#include<sstream>
+#include <regex>
+using namespace std;
+static string readFile(const string& fileName) {
+	ifstream f(fileName);
+	stringstream ss;
+	ss << f.rdbuf();
+	return ss.str();
+}
+int main() {
+	string src = readFile("source.txt");
+	regex reg ("href\\s?=\\s?\"(https?:\\/\\/[a-z\\.\\/]+)?\"");
+	smatch result;
+	string::const_iterator start = src.begin();
+	string::const_iterator end = src.cend();
+	while (regex_search (start,end, result, reg)) {
+		cout << result[1] << endl;
+		//внутри while бесконечно будет вестись поиск одного и того же фрагмента.
+		// поэтому после поиска возьмем оставшийся после поиска кусок
+		// В данном примере просто передвинем итератор
+		start = result.suffix().first;
+	}
+	return 0;
+}
+```
